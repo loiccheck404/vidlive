@@ -1,9 +1,7 @@
-function VideoWindow() {
+function VideoWindow({ children }) {
   return (
     <div className="video-window">
-      <video className="video-display">
-        {/* Our character will appear here! */}
-      </video>
+      <div className="video-display">{children}</div>
       <div className="participant-name">Demo User</div>
     </div>
   );
