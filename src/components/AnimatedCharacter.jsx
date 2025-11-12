@@ -42,22 +42,26 @@ function AnimatedCharacter() {
       // Apply transformations
       ctx.save();
       ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.translate(animator.positionX, animator.positionY); // Add position shifts!
       ctx.rotate((animator.rotation * Math.PI) / 180);
       ctx.scale(animator.scale, animator.scale);
       ctx.translate(-canvas.width / 2, -canvas.height / 2);
 
-      // Draw image
+      // Draw image (covers entire canvas)
       const imgRatio = img.width / img.height;
       const canvasRatio = canvas.width / canvas.height;
 
       let drawWidth, drawHeight, offsetX, offsetY;
 
+      // Fill entire canvas (like object-fit: cover)
       if (imgRatio > canvasRatio) {
+        // Image is wider - fit to height
         drawHeight = canvas.height;
         drawWidth = img.width * (canvas.height / img.height);
         offsetX = (canvas.width - drawWidth) / 2;
         offsetY = 0;
       } else {
+        // Image is taller - fit to width
         drawWidth = canvas.width;
         drawHeight = img.height * (canvas.width / img.width);
         offsetX = 0;
@@ -66,17 +70,17 @@ function AnimatedCharacter() {
 
       ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
 
-      // Draw blink
+      ctx.restore(); // End transformations
+
+      // Draw blink overlay AFTER transformations (so it stays in place!)
       const blinkAmount = animator.getBlinkAmount();
       if (blinkAmount > 0) {
-        ctx.fillStyle = `rgba(0, 0, 0, ${blinkAmount * 0.8})`;
-        // Cover eyes area (adjust these values based on your image)
-        const eyeY = canvas.height * 0.35;
-        const eyeHeight = canvas.height * 0.08;
+        ctx.fillStyle = `rgba(255, 0, 0, 0.8)`; // BRIGHT RED for testing!
+        // Adjust these values to match YOUR character's eye position!
+        const eyeY = canvas.height * 0.32; // Adjust this up/down
+        const eyeHeight = canvas.height * 0.12; // Adjust this bigger/smaller
         ctx.fillRect(0, eyeY, canvas.width, eyeHeight);
       }
-
-      ctx.restore();
     }
   }, []);
 
