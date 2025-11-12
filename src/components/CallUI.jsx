@@ -18,14 +18,22 @@ function CallUI() {
 
   return (
     <div className="call-ui">
-      <VideoWindow>{isCameraOn && <AnimatedCharacter />}</VideoWindow>
-      <CallControls
-        isMuted={isMuted}
-        isCameraOn={isCameraOn}
-        onMuteToggle={handleMuteToggle}
-        onCameraToggle={handleCameraToggle}
-        onEndCall={handleEndCall}
-      />
+      {/* Left sidebar - small video preview */}
+      <div className="sidebar">
+        <VideoWindow />
+        <CallControls
+          isMuted={isMuted}
+          isCameraOn={isCameraOn}
+          onMuteToggle={handleMuteToggle}
+          onCameraToggle={handleCameraToggle}
+          onEndCall={handleEndCall}
+        />
+      </div>
+
+      {/* Right main area - BIG animated character */}
+      <div className="main-character-area">
+        {isCameraOn && <AnimatedCharacter />}
+      </div>
     </div>
   );
 }
