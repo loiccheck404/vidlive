@@ -31,8 +31,8 @@ export class Animator {
 
     // Breathing/idle movement
     this.breathingPhase += deltaTime / 2000;
-    this.rotation = Math.sin(this.breathingPhase) * 2; // -2° to +2°
-    this.scale = 1 + Math.sin(this.breathingPhase * 0.5) * 0.02; // 0.98 to 1.02
+    this.rotation = Math.sin(this.breathingPhase) * 4; // -2° to +2°
+    this.scale = 1 + Math.sin(this.breathingPhase * 0.5) * 0.04; // 0.98 to 1.02
   }
 
   getBlinkAmount() {
