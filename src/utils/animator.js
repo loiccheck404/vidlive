@@ -27,7 +27,7 @@ export class Animator {
   }
 
   getRandomBlinkDelay() {
-    return 500; // Blink every half second for testing!
+    return 2000 + Math.random() * 4000; // 2-6 seconds
   }
 
   getRandomAdjustmentDelay() {
@@ -39,7 +39,7 @@ export class Animator {
     this.blinkTimer += deltaTime;
 
     if (this.isBlinking) {
-      this.blinkProgress += deltaTime / 400; // Slower blink = easier to see
+      this.blinkProgress += deltaTime / 150; // Quick natural blink
       if (this.blinkProgress >= 1) {
         this.isBlinking = false;
         this.blinkProgress = 0;
@@ -93,8 +93,7 @@ export class Animator {
   }
 
   getBlinkAmount() {
-    return 1; // ALWAYS VISIBLE for testing!
-    // if (!this.isBlinking) return 0;
-    // return Math.sin(this.blinkProgress * Math.PI);
+    if (!this.isBlinking) return 0;
+    return Math.sin(this.blinkProgress * Math.PI);
   }
 }
