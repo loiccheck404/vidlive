@@ -3,23 +3,23 @@ import { useState } from "react";
 function ImageUploader({ onAnimationReady }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
+  const [showInput, setShowInput] = useState(false);
 
-  const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  const handleCreateAnimation = async () => {
+    if (!imageUrl.trim()) {
+      setError("Please enter an image URL");
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
 
     try {
-      // Step 1: Convert image to base64
-      const base64Image = await fileToBase64(file);
-
-      // Step 2: Send to D-ID to create animated video
-      const videoUrl = await createAnimatedVideo(base64Image);
-
-      // Step 3: Tell parent component we have the video!
+      const videoUrl = await createAnimatedVideo(imageUrl);
       onAnimationReady(videoUrl);
+      setShowInput(false);
+      setImageUrl("");
     } catch (err) {
       setError(err.message);
       console.error("Error:", err);
@@ -28,18 +28,8 @@ function ImageUploader({ onAnimationReady }) {
     }
   };
 
-  const fileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const createAnimatedVideo = async (base64Image) => {
+  const createAnimatedVideo = async (imageUrl) => {
     try {
-      // Call OUR backend server (which then calls D-ID)
       const response = await fetch(
         "http://localhost:3001/api/create-animation",
         {
@@ -48,7 +38,7 @@ function ImageUploader({ onAnimationReady }) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            imageData: base64Image,
+            imageData: imageUrl,
           }),
         }
       );
@@ -66,20 +56,15 @@ function ImageUploader({ onAnimationReady }) {
 
       console.log("Animation created! ID:", talkId);
 
-      // Wait for D-ID to process the video
       return await pollForVideo(talkId);
     } catch (err) {
       console.error("Full error:", err);
-      throw new Error(
-        `API Error: ${err.message}. Make sure backend server is running!`
-      );
+      throw new Error(`API Error: ${err.message}`);
     }
   };
 
   const pollForVideo = async (talkId) => {
-    // Check every 3 seconds if video is ready
     for (let i = 0; i < 40; i++) {
-      // Try for up to 2 minutes
       await sleep(3000);
 
       const response = await fetch(
@@ -91,7 +76,7 @@ function ImageUploader({ onAnimationReady }) {
 
       if (data.status === "done") {
         console.log("Video ready!", data.result_url);
-        return data.result_url; // Video is ready!
+        return data.result_url;
       }
 
       if (data.status === "error") {
@@ -106,16 +91,40 @@ function ImageUploader({ onAnimationReady }) {
 
   return (
     <div className="image-uploader">
-      <label className="upload-btn">
-        {isLoading ? "Creating animation..." : "Upload New Character"}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          disabled={isLoading}
-          style={{ display: "none" }}
-        />
-      </label>
+      {!showInput ? (
+        <button className="upload-btn" onClick={() => setShowInput(true)}>
+          Upload New Character
+        </button>
+      ) : (
+        <div className="url-input-container">
+          <input
+            type="text"
+            placeholder="Paste image URL (from postimages.org)"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            className="url-input"
+            disabled={isLoading}
+          />
+          <button
+            className="upload-btn"
+            onClick={handleCreateAnimation}
+            disabled={isLoading || !imageUrl.trim()}
+          >
+            {isLoading ? "Creating..." : "Animate!"}
+          </button>
+          <button
+            className="cancel-btn"
+            onClick={() => {
+              setShowInput(false);
+              setImageUrl("");
+              setError(null);
+            }}
+            disabled={isLoading}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
 
       {isLoading && (
         <div className="loading-message">

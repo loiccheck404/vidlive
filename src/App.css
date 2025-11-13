@@ -135,24 +135,65 @@
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s;
+  border: none;
+  font-size: 14px;
 }
 
-.upload-btn:hover {
+.upload-btn:hover:not(:disabled) {
   background: #45a049;
   transform: scale(1.05);
+}
+
+.upload-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.url-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.url-input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: white;
+  font-size: 13px;
+}
+
+.url-input:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: #5a6268;
 }
 
 .loading-message {
   margin-top: 15px;
   color: #4caf50;
-  font-size: 14px;
+  font-size: 12px;
   animation: pulse 1.5s infinite;
 }
 
 .error-message {
   margin-top: 15px;
   color: #ff4444;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 @keyframes pulse {
