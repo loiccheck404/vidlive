@@ -21,7 +21,7 @@
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   display: grid;
-  grid-template-columns: 220px 1fr; /* Narrower left sidebar + bigger main area */
+  grid-template-columns: 280px 1fr; /* Narrower left sidebar + bigger main area */
 }
 
 /* LEFT SIDEBAR */
@@ -118,4 +118,49 @@
   font-size: 32px;
   font-weight: 600;
   padding: 100px;
+}
+
+/* Image Uploader Styles */
+.image-uploader {
+  padding: 15px;
+  text-align: center;
+}
+
+.upload-btn {
+  display: inline-block;
+  background: #4caf50;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.upload-btn:hover {
+  background: #45a049;
+  transform: scale(1.05);
+}
+
+.loading-message {
+  margin-top: 15px;
+  color: #4caf50;
+  font-size: 14px;
+  animation: pulse 1.5s infinite;
+}
+
+.error-message {
+  margin-top: 15px;
+  color: #ff4444;
+  font-size: 14px;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
