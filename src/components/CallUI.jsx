@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import VideoWindow from "./VideoWindow";
 import CallControls from "./CallControls";
 import AnimatedCharacter from "./AnimatedCharacter";
@@ -9,6 +9,7 @@ function CallUI() {
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [isCallActive, setIsCallActive] = useState(true);
   const [animatedVideoUrl, setAnimatedVideoUrl] = useState(null);
+  const videoRef = useRef(null);
 
   const handleMuteToggle = () => setIsMuted(!isMuted);
   const handleCameraToggle = () => setIsCameraOn(!isCameraOn);
@@ -18,6 +19,13 @@ function CallUI() {
     setAnimatedVideoUrl(videoUrl);
     console.log("Animated video ready:", videoUrl);
   };
+
+  // Control video mute state
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
 
   if (!isCallActive) {
     return <div className="call-ended">Call Ended</div>;
@@ -43,10 +51,13 @@ function CallUI() {
         {isCameraOn && !animatedVideoUrl && <AnimatedCharacter />}
         {isCameraOn && animatedVideoUrl && (
           <video
+            ref={videoRef}
             src={animatedVideoUrl}
             autoPlay
             loop
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            muted={isMuted}
+            playsInline
+            className="animated-video"
           />
         )}
       </div>

@@ -41,8 +41,11 @@ app.post("/api/create-animation", async (req, res) => {
         },
       };
     } else {
-      // Silent animation - just idle movements
-      requestBody.driver_url = "bank://lively";
+      // Silent animation - use very short silence
+      requestBody.script = {
+        type: "audio",
+        audio_url: "https://d-id-public-bucket.s3.amazonaws.com/webrtc.mp4", // D-ID's silent audio
+      };
     }
 
     const response = await fetch("https://api.d-id.com/talks", {
