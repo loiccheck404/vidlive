@@ -17,9 +17,33 @@ app.post("/api/create-animation", async (req, res) => {
   try {
     const { imageData } = req.body;
 
-    console.log("Creating animation...");
+    console.log("Step 1: Uploading image to D-ID...");
 
-    // Call D-ID API
+    // First, upload the image to D-ID
+    const uploadResponse = await fetch("https://api.d-id.com/images", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${D_ID_API_KEY}`,
+      },
+      body: JSON.stringify({
+        image: imageData,
+      }),
+    });
+
+    const uploadData = await uploadResponse.json();
+
+    if (!uploadResponse.ok) {
+      console.error("D-ID Upload Error:", uploadData);
+      return res.status(uploadResponse.status).json(uploadData);
+    }
+
+    const imageUrl = uploadData.url;
+    console.log("Step 2: Image uploaded! URL:", imageUrl);
+
+    // Now create the animation using the uploaded image URL
+    console.log("Step 3: Creating animation...");
+
     const response = await fetch("https://api.d-id.com/talks", {
       method: "POST",
       headers: {
@@ -28,7 +52,7 @@ app.post("/api/create-animation", async (req, res) => {
         Accept: "application/json",
       },
       body: JSON.stringify({
-        source_url: imageData,
+        source_url: imageUrl,
         script: {
           type: "text",
           input: "Hello! I am alive now!",
@@ -52,7 +76,7 @@ app.post("/api/create-animation", async (req, res) => {
       return res.status(response.status).json(data);
     }
 
-    console.log("Animation started, ID:", data.id);
+    console.log("Step 4: Animation started! ID:", data.id);
     res.json(data);
   } catch (error) {
     console.error("Server error:", error);
