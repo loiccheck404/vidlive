@@ -4,6 +4,7 @@ function ImageUploader({ onAnimationReady }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
+  const [speechText, setSpeechText] = useState(""); // What character should say
   const [showInput, setShowInput] = useState(false);
 
   const handleCreateAnimation = async () => {
@@ -16,10 +17,11 @@ function ImageUploader({ onAnimationReady }) {
     setError(null);
 
     try {
-      const videoUrl = await createAnimatedVideo(imageUrl);
+      const videoUrl = await createAnimatedVideo(imageUrl, speechText);
       onAnimationReady(videoUrl);
       setShowInput(false);
       setImageUrl("");
+      setSpeechText("");
     } catch (err) {
       setError(err.message);
       console.error("Error:", err);
@@ -28,7 +30,7 @@ function ImageUploader({ onAnimationReady }) {
     }
   };
 
-  const createAnimatedVideo = async (imageUrl) => {
+  const createAnimatedVideo = async (imageUrl, speechText) => {
     try {
       const response = await fetch(
         "http://localhost:3001/api/create-animation",
@@ -39,6 +41,7 @@ function ImageUploader({ onAnimationReady }) {
           },
           body: JSON.stringify({
             imageData: imageUrl,
+            speechText: speechText || "", // Send empty string if no text
           }),
         }
       );
@@ -105,6 +108,14 @@ function ImageUploader({ onAnimationReady }) {
             className="url-input"
             disabled={isLoading}
           />
+          <input
+            type="text"
+            placeholder="What should the character say? (leave empty for silent)"
+            value={speechText}
+            onChange={(e) => setSpeechText(e.target.value)}
+            className="url-input"
+            disabled={isLoading}
+          />
           <button
             className="upload-btn"
             onClick={handleCreateAnimation}
@@ -117,6 +128,7 @@ function ImageUploader({ onAnimationReady }) {
             onClick={() => {
               setShowInput(false);
               setImageUrl("");
+              setSpeechText("");
               setError(null);
             }}
             disabled={isLoading}

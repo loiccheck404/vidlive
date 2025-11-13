@@ -15,11 +15,36 @@ app.use(express.json({ limit: "50mb" })); // Handle large base64 images
 // Create animation endpoint
 app.post("/api/create-animation", async (req, res) => {
   try {
-    const { imageData } = req.body;
+    const { imageData, speechText } = req.body;
 
     console.log("Creating animation with image URL...");
+    console.log("Speech text:", speechText || "(silent - no speech)");
 
-    // Use the image URL directly (no upload needed!)
+    // Build the request body
+    const requestBody = {
+      source_url: imageData,
+      config: {
+        fluent: true,
+        pad_audio: 0,
+        stitch: true,
+      },
+    };
+
+    // Only add script if user provided text
+    if (speechText && speechText.trim()) {
+      requestBody.script = {
+        type: "text",
+        input: speechText.trim(),
+        provider: {
+          type: "microsoft",
+          voice_id: "en-US-JennyNeural",
+        },
+      };
+    } else {
+      // Silent animation - just idle movements
+      requestBody.driver_url = "bank://lively";
+    }
+
     const response = await fetch("https://api.d-id.com/talks", {
       method: "POST",
       headers: {
@@ -27,22 +52,7 @@ app.post("/api/create-animation", async (req, res) => {
         Authorization: `Basic ${D_ID_API_KEY}`,
         Accept: "application/json",
       },
-      body: JSON.stringify({
-        source_url: imageData, // Direct URL
-        script: {
-          type: "text",
-          input: "Hello! I am alive now!",
-          provider: {
-            type: "microsoft",
-            voice_id: "en-US-JennyNeural",
-          },
-        },
-        config: {
-          fluent: true,
-          pad_audio: 0,
-          stitch: true,
-        },
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     const data = await response.json();
